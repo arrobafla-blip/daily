@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>daily. — seu planner pessoal</title>
+<meta name="description" content="Protótipo visual do Daily, planner pessoal personalizável.">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+:root{
+  /* Paleta editorial provisória; ajuste estes tokens aos valores exatos do CSS da Call Creative Studio. */
+  --paper:#F7F4ED; --surface:#FFFEFA; --ink:#191919; --muted:#77746D;
+  --line:#DCD8CF; --accent:#D9FF3F; --accent-ink:#191919; --soft:#ECE8DE;
+  --radius:18px; --display:'Space Grotesk',sans-serif; --body:'DM Sans',sans-serif; --mono:'DM Mono',monospace;
+}
+*{box-sizing:border-box} body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:14px}
+button,input{font:inherit} button{cursor:pointer}
+.shell{display:grid;grid-template-columns:228px minmax(0,1fr);min-height:100vh}
+aside{padding:28px 18px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:32px;background:var(--paper)}
+.brand{font:700 30px/1 var(--display);letter-spacing:-1.8px}.brand span{color:#777}
+.eyebrow{font:500 10px var(--mono);text-transform:uppercase;letter-spacing:1.2px;color:var(--muted)}
+.profile{display:flex;align-items:center;gap:10px;padding:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px}
+.avatar{width:34px;height:34px;border-radius:50%;background:var(--accent);display:grid;place-items:center;font-weight:700}
+.profile strong{display:block;font-size:13px}.profile small{color:var(--muted);font-size:11px}
+nav{display:grid;gap:5px}.nav-btn{display:flex;align-items:center;gap:11px;width:100%;text-align:left;padding:11px 12px;border:0;background:transparent;border-radius:10px;color:#4d4b46}
+.nav-btn.active{background:var(--ink);color:white}.nav-btn .ico{width:19px;text-align:center;font-size:16px}
+.nav-btn:hover:not(.active){background:var(--soft)}
+.side-bottom{margin-top:auto;border-top:1px solid var(--line);padding-top:18px}
+main{padding:30px clamp(18px,3vw,44px) 48px;max-width:1600px;width:100%;margin:auto}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:34px}
+.date-label{font:11px var(--mono);letter-spacing:.7px;text-transform:uppercase;color:var(--muted)}
+.top-actions{display:flex;gap:8px}.icon-btn,.outline-btn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:9px 13px;color:var(--ink)}
+.primary-btn{background:var(--accent);border:1px solid var(--ink);border-radius:999px;padding:10px 15px;font-weight:700;color:var(--ink)}
+.greeting{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:25px}
+h1,h2,h3,p{margin-top:0}h1{font:600 clamp(36px,4vw,58px)/.98 var(--display);letter-spacing:-2.6px;margin-bottom:12px}
+h1 em{font-style:normal;background:var(--accent);padding:0 .12em}.intro{color:var(--muted);margin:0;max-width:460px;line-height:1.6}
+.greeting-note{font:11px var(--mono);color:var(--muted);text-align:right;line-height:1.7}
+.grid{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px;min-width:0}
+.card.dark{background:var(--ink);color:white;border-color:var(--ink)}
+.card-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:17px}
+.card h2{font:600 18px/1.15 var(--display);letter-spacing:-.45px;margin:0}
+.card h3{font:600 14px var(--body);margin:0}
+.card-label{font:10px var(--mono);text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
+.dark .card-label{color:#c5c2b9}
+.link-btn{border:0;background:transparent;color:inherit;text-decoration:underline;text-underline-offset:3px;font-size:11px}
+.agenda{grid-row:span 2}.agenda-list{display:grid;gap:0}
+.agenda-item{display:grid;grid-template-columns:48px 3px minmax(0,1fr);gap:11px;padding:13px 0;border-bottom:1px solid var(--line)}
+.agenda-item:last-child{border:0}.time{font:11px var(--mono);color:var(--muted);padding-top:2px}
+.agenda-line{background:var(--accent);border-radius:4px}.agenda-item:nth-child(2) .agenda-line{background:#A9A49A}.agenda-item:nth-child(3) .agenda-line{background:#E4B5A8}
+.agenda-item strong{font-size:13px;display:block;margin-bottom:4px}.agenda-item small{font-size:11px;color:var(--muted)}
+.task-list{display:grid;gap:12px}.task{display:flex;align-items:flex-start;gap:9px;line-height:1.4}
+.task input,.habit-check{accent-color:var(--ink);width:16px;height:16px;margin:1px 0 0}
+.task.done span{text-decoration:line-through;color:var(--muted)}
+.progress-wrap{display:flex;align-items:center;gap:10px;margin-top:18px}.progress{height:6px;background:var(--soft);border-radius:99px;flex:1;overflow:hidden}.progress>span{display:block;height:100%;background:var(--accent);width:60%}
+.progress-wrap small{font:10px var(--mono);color:var(--muted)}
+.stat-row{display:flex;align-items:end;justify-content:space-between}.big-stat{font:600 38px/1 var(--display);letter-spacing:-2px}.stat-sub{font-size:11px;color:var(--muted);margin-top:8px}
+.habit-card{grid-column:2 / 4}.habit-table{width:100%;border-collapse:collapse;font-size:12px}.habit-table th{font:10px var(--mono);color:var(--muted);font-weight:400;text-align:center;padding:8px 5px;border-bottom:1px solid var(--line)}
+.habit-table th:first-child{text-align:left;width:34%}.habit-table td{padding:10px 5px;border-bottom:1px solid #eeebe4;text-align:center}
+.habit-table td:first-child{text-align:left;font-weight:600}.habit-table tr:last-child td{border:0}
+.habit-cell{width:23px;height:23px;border:1px solid #c8c4bb;border-radius:7px;background:transparent;color:transparent}
+.habit-cell.checked{background:var(--accent);border-color:var(--ink);color:var(--ink)}.habit-cell:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid #7d7d7d;outline-offset:2px}
+.habit-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:13px;color:var(--muted);font-size:11px}
+.bottom-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}
+.quicklinks{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.quicklink{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 8px;text-align:left;font-size:11px;color:var(--ink)}
+.quicklink span{display:block;font-size:18px;margin-bottom:9px}
+.quote{font:500 21px/1.25 var(--display);letter-spacing:-.6px;margin:12px 0 18px;max-width:340px}
+.quote-credit{font:10px var(--mono);color:#c5c2b9;text-transform:uppercase;letter-spacing:.8px}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:white;padding:10px 15px;border-radius:99px;font-size:12px;display:none}
+@media(max-width:1000px){.grid{grid-template-columns:1fr 1fr}.agenda{grid-row:span 2}.habit-card{grid-column:1/-1}.bottom-grid{grid-template-columns:1fr}}
+@media(max-width:680px){.shell{grid-template-columns:1fr}aside{padding:15px 16px;border-right:0;border-bottom:1px solid var(--line);gap:14px}.brand-row{display:flex;justify-content:space-between;align-items:center}.profile{padding:7px 10px}.profile .avatar{width:28px;height:28px}nav{display:flex;overflow-x:auto;padding-bottom:3px} .nav-btn{width:auto;white-space:nowrap;padding:9px 10px}.nav-btn .ico{width:auto}.side-bottom{display:none}main{padding:23px 14px 35px}.topbar{margin-bottom:25px}.top-actions .outline-btn{display:none}.greeting{align-items:flex-start}.greeting-note{display:none}.grid{grid-template-columns:1fr}.agenda{grid-row:auto}.habit-card{grid-column:auto}.bottom-grid{grid-template-columns:1fr}.quicklinks{grid-template-columns:repeat(4,1fr)}.card{padding:17px}.habit-table th:first-child{width:38%}.habit-table th{padding:8px 2px}.habit-table td{padding:9px 2px}.habit-cell{width:21px;height:21px;border-radius:6px}}
+</style>
+</head>
+<body>
+<div class="shell">
+<aside>
+  <div class="brand-row"><div class="brand">daily<span>.</span></div><span class="eyebrow">seu espaço</span></div>
+  <div class="profile"><div class="avatar">f.</div><div><strong>flá</strong><small>seu cantinho, do seu jeito</small></div></div>
+  <div><div class="eyebrow" style="margin:0 0 10px 10px">Seu universo</div>
+    <nav aria-label="Navegação principal">
+      <button class="nav-btn active" data-section="Meu dia"><span class="ico">✳</span> Meu dia</button>
+      <button class="nav-btn" data-section="Calendário"><span class="ico">▦</span> Calendário</button>
+      <button class="nav-btn" data-section="Hábitos"><span class="ico">✓</span> Hábitos</button>
+      <button class="nav-btn" data-section="Saúde & bem-estar"><span class="ico">♡</span> Saúde & bem-estar</button>
+      <button class="nav-btn" data-section="Estudos"><span class="ico">↗</span> Estudos</button>
+      <button class="nav-btn" data-section="Finanças"><span class="ico">◒</span> Finanças</button>
+      <button class="nav-btn" data-section="Projetos"><span class="ico">✳</span> Projetos</button>
+      <button class="nav-btn" data-section="Família"><span class="ico">⌂</span> Família</button>
+      <button class="nav-btn" data-section="Casa"><span class="ico">⌘</span> Casa</button>
+      <button class="nav-btn" data-section="Autocuidado"><span class="ico">✿</span> Autocuidado</button>
+      <button class="nav-btn" data-section="Lazer"><span class="ico">↗</span> Lazer</button>
+      <button class="nav-btn" data-section="Clientes"><span class="ico">▤</span> Clientes</button>
+      <button class="nav-btn" data-section="Diário"><span class="ico">✎</span> Diário</button>
+      <button class="nav-btn" data-section="Meu progresso"><span class="ico">⌁</span> Meu progresso</button>
+    </nav>
+  </div>
+  <div class="side-bottom"><button class="nav-btn" data-section="Personalização"><span class="ico">⚙</span> Personalização</button><div class="eyebrow" style="margin:13px 10px 0">um dia de cada vez.</div></div>
+</aside>
+<main>
+  <div class="topbar"><div><div class="date-label" id="today"></div><div class="eyebrow" style="margin-top:5px">ESTÚDIO PESSOAL · DAILY PLANNER</div></div><div class="top-actions"><button class="outline-btn" id="reset">Restaurar exemplo</button><button class="primary-btn" id="addTask">+ Nova tarefa</button></div></div>
+  <section class="greeting"><div><div class="eyebrow" style="margin-bottom:13px">UM ESPAÇO PARA VOCÊ</div><h1 id="greeting">Bom dia, <em>flá.</em></h1><p class="intro">Organize o que importa, cuide de você e deixe espaço para o inesperado.</p></div><div class="greeting-note">MENOS CORRERIA.<br>MAIS INTENÇÃO. ✳</div></section>
+  <section class="grid">
+    <article class="card agenda"><div class="card-head"><div><div class="card-label">01 / em foco</div><h2 style="margin-top:7px">A agenda de hoje</h2></div><button class="link-btn" data-demo="Calendário">ver calendário ↗</button></div>
+      <div class="agenda-list">
+        <div class="agenda-item"><div class="time">09:00</div><div class="agenda-line"></div><div><strong>Começar com calma</strong><small>Rotina da manhã · autocuidado</small></div></div>
+        <div class="agenda-item"><div class="time">11:30</div><div class="agenda-line"></div><div><strong>Foco no projeto</strong><small>Bloco de trabalho · 1 hora</small></div></div>
+        <div class="agenda-item"><div class="time">14:00</div><div class="agenda-line"></div><div><strong>Estudar um pouquinho</strong><small>Desenvolvimento pessoal</small></div></div>
+        <div class="agenda-item"><div class="time">17:00</div><div class="agenda-line"></div><div><strong>Tempo em família</strong><small>Presença antes da lista</small></div></div>
+      </div>
+      <button class="outline-btn" style="width:100%;margin-top:12px" id="addEvent">+ Adicionar compromisso</button>
+    </article>
+    <article class="card"><div class="card-head"><div><div class="card-label">02 / pequenas entregas</div><h2 style="margin-top:7px">Lista de tarefas</h2></div><span class="eyebrow" id="taskCount">0/4</span></div>
+      <div class="task-list" id="tasks">
+        <label class="task"><input type="checkbox"><span>Organizar prioridades do dia</span></label>
+        <label class="task"><input type="checkbox" checked><span>Separar 15 min para mim</span></label>
+        <label class="task"><input type="checkbox"><span>Revisar agenda da semana</span></label>
+        <label class="task"><input type="checkbox"><span>Responder mensagens importantes</span></label>
+      </div><div class="progress-wrap"><div class="progress"><span id="taskProgress" style="width:25%"></span></div><small id="taskPercent">25%</small></div>
+    </article>
+    <article class="card dark"><div class="card-head"><div><div class="card-label">03 / lembrete gentil</div><h2 style="margin-top:7px">Uma coisa de cada vez.</h2></div><span style="font-size:23px;color:var(--accent)">✳</span></div><p class="quote">“A maneira de começar é parar de falar e começar a fazer.”</p><div class="quote-credit">Walt Disney · frase atribuída</div></article>
+    <article class="card"><div class="card-head"><div><div class="card-label">04 / seu cuidado</div><h2 style="margin-top:7px">Check-in rápido</h2></div><span>♡</span></div><div class="stat-row"><div><div class="big-stat" id="waterCount">3 <span style="font-size:18px">/ 8</span></div><div class="stat-sub">copos de água hoje</div></div><button class="primary-btn" id="waterAdd">+ Água</button></div><div class="progress-wrap"><div class="progress"><span id="waterProgress" style="width:37.5%"></span></div><small id="waterPct">38%</small></div><div style="margin-top:18px;display:flex;gap:8px;flex-wrap:wrap"><button class="outline-btn" data-demo="Alimentação">+ Alimentação</button><button class="outline-btn" data-demo="Treino">+ Treino</button><button class="outline-btn" data-demo="Humor">Como estou?</button></div></article>
+    <article class="card habit-card"><div class="card-head"><div><div class="card-label">05 / consistência, não perfeição</div><h2 style="margin-top:7px">Habit tracker da semana</h2></div><button class="link-btn" data-demo="Hábitos">ver histórico ↗</button></div>
+      <div style="overflow-x:auto"><table class="habit-table"><thead><tr><th>Hábito</th><th>SEG</th><th>TER</th><th>QUA</th><th>QUI</th><th>SEX</th><th>SÁB</th><th>DOM</th></tr></thead><tbody id="habitRows"></tbody></table></div>
+      <div class="habit-foot"><span id="habitSummary">Marque o que você conseguiu fazer.</span><span id="habitOverall">0% concluído</span></div>
+    </article>
+  </section>
+  <section class="bottom-grid">
+    <article class="card"><div class="card-head"><div><div class="card-label">06 / acesso rápido</div><h2 style="margin-top:7px">Seu universo, em um toque</h2></div><span>↗</span></div>
+      <div class="quicklinks">
+        <button class="quicklink" data-demo="Diário"><span>✎</span>Diário</button>
+        <button class="quicklink" data-demo="Estudos"><span>▤</span>Estudos</button>
+        <button class="quicklink" data-demo="Finanças"><span>◒</span>Finanças</button>
+        <button class="quicklink" data-demo="Autocuidado"><span>✿</span>Autocuidado</button>
+      </div>
+    </article>
+    <article class="card"><div class="card-head"><div><div class="card-label">07 / visão geral</div><h2 style="margin-top:7px">Seu dia não precisa ser perfeito.</h2></div><span>✳</span></div><p style="line-height:1.65;color:var(--muted);margin-bottom:0">O Daily reúne agenda, hábitos, saúde, estudos, finanças, projetos, família, casa, autocuidado, lazer, clientes e diário — com espaço para personalizar sua página e deixar áreas sensíveis ocultas.</p></article>
+  </section>
+  <p class="eyebrow" style="margin-top:24px;text-align:right">PROTÓTIPO VISUAL · DADOS DE EXEMPLO · NÃO SALVA NA NUVEM</p>
+</main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+const $=s=>document.querySelector(s);
+const weekdays=['SEG','TER','QUA','QUI','SEX','SÁB','DOM'];
+const habits=[
+ {name:'Beber água',days:[1,1,1,0,0,0,0]},
+ {name:'Ler 10 páginas',days:[1,0,1,0,0,0,0]},
+ {name:'Movimentar o corpo',days:[1,1,0,0,0,0,0]},
+ {name:'Rotina de skincare',days:[1,1,1,1,0,0,0]},
+ {name:'Estudar',days:[0,1,1,0,0,0,0]}
+];
+function renderHabits(){
+ const tbody=$('#habitRows');tbody.innerHTML='';
+ habits.forEach((h,hi)=>{const tr=document.createElement('tr');const name=document.createElement('td');name.textContent=h.name;tr.appendChild(name);
+ h.days.forEach((v,di)=>{const td=document.createElement('td');const b=document.createElement('button');b.className='habit-cell'+(v?' checked':'');b.textContent=v?'✓':'';b.setAttribute('aria-label',h.name+', '+weekdays[di]+(v?', concluído':', não concluído'));b.setAttribute('aria-pressed',v?'true':'false');b.onclick=()=>{h.days[di]=h.days[di]?0:1;renderHabits()};td.appendChild(b);tr.appendChild(td)});tbody.appendChild(tr)});
+ const total=habits.reduce((s,h)=>s+h.days.length,0),done=habits.reduce((s,h)=>s+h.days.reduce((a,b)=>a+b,0),0);
+ $('#habitOverall').textContent=Math.round(done/total*100)+'% concluído';$('#habitSummary').textContent=done+' de '+total+' marcações na semana';
+}
+function updateTasks(){const items=[...document.querySelectorAll('#tasks .task')];const done=items.filter(x=>x.querySelector('input').checked).length;items.forEach(x=>x.classList.toggle('done',x.querySelector('input').checked));$('#taskCount').textContent=done+'/'+items.length;$('#taskProgress').style.width=(done/items.length*100)+'%';$('#taskPercent').textContent=Math.round(done/items.length*100)+'%'}
+function toast(msg){const t=$('#toast');t.textContent=msg;t.style.display='block';clearTimeout(window.toastTimer);window.toastTimer=setTimeout(()=>t.style.display='none',2600)}
+function showSection(name){document.querySelectorAll('.nav-btn[data-section]').forEach(b=>b.classList.toggle('active',b.dataset.section===name));toast(name+': esta área será desenvolvida na próxima etapa do Daily.')}
+const now=new Date();$('#today').textContent=now.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long',year:'numeric'}).toUpperCase();
+const hour=now.getHours();$('#greeting').innerHTML=(hour<12?'Bom dia, ':hour<18?'Boa tarde, ':'Boa noite, ')+'<em>flá.</em>';
+renderHabits();updateTasks();
+$('#tasks').addEventListener('change',updateTasks);
+$('#waterAdd').onclick=()=>{let n=Number($('#waterCount').dataset.count||3);n=Math.min(n+1,8);$('#waterCount').dataset.count=n;$('#waterCount').innerHTML=n+' <span style="font-size:18px">/ 8</span>';$('#waterProgress').style.width=(n/8*100)+'%';$('#waterPct').textContent=Math.round(n/8*100)+'%';toast('Água registrada no protótipo!')};
+$('#addTask').onclick=()=>{const label=prompt('Qual tarefa você quer adicionar?');if(label&&label.trim()){const el=document.createElement('label');el.className='task';const input=document.createElement('input');input.type='checkbox';const span=document.createElement('span');span.textContent=label.trim();el.append(input,span);$('#tasks').appendChild(el);updateTasks();toast('Tarefa adicionada ao exemplo.')}};
+$('#addEvent').onclick=()=>{const title=prompt('Qual compromisso você quer adicionar?');if(title&&title.trim()){const row=document.createElement('div');row.className='agenda-item';row.innerHTML='<div class="time">NOVO</div><div class="agenda-line"></div><div></div>';const content=row.lastElementChild;const strong=document.createElement('strong');strong.textContent=title.trim();const small=document.createElement('small');small.textContent='Compromisso adicionado no protótipo';content.append(strong,small);$('.agenda-list').appendChild(row);toast('Compromisso adicionado ao exemplo.')}};
+document.querySelectorAll('.nav-btn[data-section]').forEach(b=>b.addEventListener('click',()=>showSection(b.dataset.section)));
+document.querySelectorAll('[data-demo]').forEach(b=>b.addEventListener('click',()=>showSection(b.dataset.demo)));
+$('#reset').onclick=()=>{location.reload()};
+</script>
+</body>
+</html>
